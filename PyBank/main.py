@@ -55,3 +55,5 @@ with open(bugdetPath, newline='') as budgetFile:
     print('Average Change: ' , '$',round((monthlyChange / (totalMonths-1)),2))
     print('Greatest Increase in Profits' , '$' , max_increase)
     print('Greatest Decrease in Profits' , '$' , min_decrease)
+    file = open("py_bank.txt" , 'w')
+    file.write('file')

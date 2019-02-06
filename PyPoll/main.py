@@ -52,8 +52,13 @@ with open(electionPath, newline='') as electionFile:
         khan_percent = (khan / totalVotes) * 100
         correy_percent =(correy / totalVotes) * 100
         li_percent = (li / totalVotes) * 100
-        otooley = (otooley / totalVotes) * 100
+        otooley_percent = (otooley / totalVotes) * 100
 
     print('Total Votes: ' , totalVotes)
     print('-------------------------------')
     print('Khan : ' , khan_percent,'%')
+    print('Correy : ' , correy_percent,'%')
+    print('Li : ' , li_percent,'%')
+    print('OTooley : ' , otooley_percent,'%')
+    file = open("py_poll.txt" , 'w')
+    file.write('file')
