@@ -1,59 +1,70 @@
-import os
+# Dependencies
 import csv
+import os
 
-# Print title
-print('Financial Analysis')
-print('------------------------------')
+# Files to load and output (Remember to change these)
+file_to_load = os.path.join("budget_data.csv")
+file_to_output = os.path.join("budget_analysis.txt")
 
-# direct path to budget data
-bugdetPath = os.path.join('budget_data.csv')
+# Track various financial parameters
+total_months = 0
+month_of_change = []
+net_change_list = []
+greatest_increase = ["", 0]
+greatest_decrease = ["", 9999999999999999999]
+total_net = 0
 
-# open budgetPath as read file
-with open(bugdetPath, newline='') as budgetFile:
-    # specify delimiter
-    budgetReader = csv.reader(budgetFile, delimiter=',')
+# Read the csv and convert it into a list of dictionaries
+with open(file_to_load) as financial_data:
+    reader = csv.reader(financial_data)
 
-    # set counter to 0
-    revenue = 0
-    totalMonths = 0
-    monthlyChange = 0
-    previousrow = 0
-    counter = 0
-    max_increase = 0
-    ##max_increase_date = None
-    min_decrease = 0
-    #min_decrease_date = None
+    # Read the header row
+    header = next(reader)
 
-    # skip header line when calculating profit/loss total
-    header = next(budgetReader)
+    # Extract first row to avoid appending to net_change_list
+    first_row = next(reader)
+    total_months = total_months + 1
+    total_net = total_net + int(first_row[1])
+    prev_net = int(first_row[1])
 
-    # loop through rows to calculate profit/loss & month total
-    for row in budgetReader:
-        revenue += int(row[1])
+    for row in reader:
 
-    # calculate total number of months
-        totalMonths += 1
+        # Track the total
+        total_months = total_months + 1
+        total_net = total_net + int(row[1])
 
-        if counter == 0:
-           lastrow = int(row[1])
-           counter +=1
-        else:
-            change = int(row[1])-lastrow
-            monthlyChange +=change
-            lastrow = int(row[1])
+        # Track the net change
+        net_change = int(row[1]) - prev_net
+        prev_net = int(row[1])
+        net_change_list = net_change_list + [net_change]
+        month_of_change = month_of_change + [row[0]]
 
-            if max_increase ==0 or change < max_increase:
-                max_increase = change
-                #max_increase_date = date
-            if min_decrease ==0 or change < min_decrease:
-                min_decrease = change
-                #min_decrease_date = date
-    
-    # print
-    print('Total Months: ' , totalMonths)
-    print('Total: ' , '$' , revenue)
-    print('Average Change: ' , '$',round((monthlyChange / (totalMonths-1)),2))
-    print('Greatest Increase in Profits' , '$' , max_increase)
-    print('Greatest Decrease in Profits' , '$' , min_decrease)
-    file = open("py_bank.txt" , 'w')
-    file.write('file')
+        # Calculate the greatest increase
+        if net_change > greatest_increase[1]:
+            greatest_increase[0] = row[0]
+            greatest_increase[1] = net_change
+
+        # Calculate the greatest decrease
+        if net_change < greatest_decrease[1]:
+            greatest_decrease[0] = row[0]
+            greatest_decrease[1] = net_change
+
+# Calculate the Average Net Change
+net_monthly_avg = sum(net_change_list) / len(net_change_list)
+
+# Generate Output Summary
+output = (
+    f"\nFinancial Analysis\n"
+    f"----------------------------\n"
+    f"Total Months: {total_months}\n"
+    f"Total: ${total_net}\n"
+    f"Average  Change: ${net_monthly_avg:.2f}\n"
+    f"Greatest Increase in Profits: {greatest_increase[0]} (${greatest_increase[1]})\n"
+    f"Greatest Decrease in Profits: {greatest_decrease[0]} (${greatest_decrease[1]})\n")
+
+# Print the output (to terminal)
+print(output)
+
+# Export the results to text file
+with open(file_to_output, "w") as txt_file:
+    txt_file.write(output)
